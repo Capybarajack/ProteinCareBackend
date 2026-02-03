@@ -42,6 +42,33 @@ function buildPrompt() {
   ].join('\n');
 }
 
+function extractOutputText(data) {
+  // The raw HTTP Responses API JSON does not always include `output_text`.
+  // SDKs provide conveniences; here we normalize by reading `output` messages.
+  try {
+    const out = Array.isArray(data?.output) ? data.output : [];
+    const texts = [];
+
+    for (const item of out) {
+      if (!item || item.type !== 'message') continue;
+      const content = Array.isArray(item.content) ? item.content : [];
+      for (const c of content) {
+        if (!c) continue;
+        // Common content shapes:
+        // { type: 'output_text', text: '...' }
+        // Some providers may use { type: 'text', text: '...' }
+        if ((c.type === 'output_text' || c.type === 'text') && typeof c.text === 'string') {
+          texts.push(c.text);
+        }
+      }
+    }
+
+    return texts.join('\n').trim();
+  } catch {
+    return '';
+  }
+}
+
 async function analyzeFoodImage({ imageDataUrl, detail = 'high' }) {
   if (!imageDataUrl || typeof imageDataUrl !== 'string' || !imageDataUrl.startsWith('data:image/')) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'imageDataUrl must be a data:image/... base64 URL');
@@ -88,7 +115,7 @@ async function analyzeFoodImage({ imageDataUrl, detail = 'high' }) {
   }
 
   const data = await res.json();
-  const rawText = String(data && data.output_text ? data.output_text : '');
+  const rawText = extractOutputText(data);
 
   let parsed = null;
   try {
