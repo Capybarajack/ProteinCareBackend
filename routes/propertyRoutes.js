@@ -6,6 +6,7 @@ const authorize = require('../middlewares/authorize');
 
 
 router.post('/', propertyController.createProperty);
+router.post('/imageupload', propertyController.imageupload);
 router.get('/', propertyController.getProperties);
 router.get('/:id', propertyController.getProperty   );
 router.put('/:id', propertyController.updateProperty);

@@ -23,8 +23,8 @@ app.use(loggingMiddleware);
 // set security HTTP headers
 app.use(helmet());
 
-// parse json request body
-app.use(express.json());
+// parse json request body (increase limit for base64 image payloads)
+app.use(express.json({ limit: '20mb' }));
 
 // parse urlencoded request body
 app.use(express.urlencoded({ extended: true }));
@@ -61,8 +61,8 @@ const startServer = async () => {
     logger.info('Connected to MongoDB');
 
     // Initialize email service
-    await emailService.initializeEmailService();
-    logger.info('Email service initialized');
+   // await emailService.initializeEmailService();
+    //logger.info('Email service initialized');
 
     //await emailService.sendEmail('asdfg703703703@gmail.com' , '測試郵件', '<p>這是一封測試郵件。</p>');
     //logger.info('Test email sent successfully ');
