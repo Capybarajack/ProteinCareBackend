@@ -24,7 +24,7 @@ app.use(loggingMiddleware);
 app.use(helmet());
 
 // parse json request body (increase limit for base64 image payloads)
-app.use(express.json({ limit: '20mb' }));
+app.use(express.json({ limit: '60mb' }));
 
 // parse urlencoded request body
 app.use(express.urlencoded({ extended: true }));
